@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>打地鼠遊戲</title>
+    <style>
+        body {
+            overflow: hidden;
+            cursor: url(cursor.png) 50 50, auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            background-image: url(bg.jpg);
+            background-size: cover;
+        }
+
+        input {
+            position: fixed;
+            top: 85%;
+            left: 75%;
+            width: 70px;
+            height: 50px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 18px;
+            background-color: pink;
+            color: red;
+            box-shadow: 0 0 3px 4px #ccc;
+
+        }
+
+        td {
+            width: 200px;
+            height: 160px;
+            background-image: url(hole.png);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center 50px;
+        }
+
+        td>div {
+            width: 100%;
+            height: 100%;
+        }
+
+        .out {
+            background-image: url(out.gif);
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 110px;
+            height: 110px;
+            position: relative;
+            left: 40px;
+            animation-name: out;
+            animation-duration: 2s;
+            animation-timing-function: ease-in;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes out {
+            0% {
+                background-position: center 150px;
+            }
+
+            50% {
+                background-position: center 0px;
+            }
+
+            100% {
+                background-position: center 180px;
+            }
+        }
+
+        .in {
+            background-image: url(in.png);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 110px;
+            height: 110px;
+            position: relative;
+            left: 40px;
+            animation-name: in;
+            animation-duration: 1.5s;
+            animation-delay: 0.5s;
+            animation-timing-function: linear;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes in {
+            0% {
+                background-position: center 0px;
+            }
+
+            100% {
+                background-position: center 250px;
+            }
+        }
+
+        .score {
+            position: fixed;
+            top: 60%;
+            left: 5%;
+            width: 300px;
+            height: 250px;
+            font-family: '微軟正黑體', sans-serif;
+            font-weight: bold;
+        }
+
+        h3 {
+            margin: 0;
+        }
+
+    </style>
+</head>
+
+<body>
+    <table>
+        <tr>
+            <td>
+                <div class="content"></div>
+            </td>
+            <td>
+                <div class="content"></div>
+            </td>
+            <td>
+                <div class="content"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="content"></div>
+            </td>
+            <td>
+                <div class="content"></div>
+            </td>
+            <td>
+                <div class="content"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="content"></div>
+            </td>
+            <td>
+                <div class="content"></div>
+            </td>
+            <td>
+                <div class="content"></div>
+            </td>
+        </tr>
+    </table>
+
+    <input type="button" value="start" id="startBtn">
+
+    <div class="score">
+        <h3>目前分數: <span id="scoreText">0</span></h3><br>
+        <h3><span>最高分數: </span><span id="highNameText">XXX</span> 的分數是
+            <span id="highScoreText">0</span></h3><br>
+        <h3>註：<img src="cursor.png" style="width:30px;height:30px;">是貓草</h3>
+        <h1>剩餘 <span id="sec" style="color:red">x</span> 秒</h1>
+    </div>
+
+    <script>
+        let score = 0;
+        let scoreText = document.getElementById("scoreText");
+        let startBtn = document.getElementById("startBtn");
+        let divs = document.getElementsByClassName("content");
+
+        let sec = document.getElementById("sec");
+        // let total = 20;
+
+        // 設定計時器的變數為 0 ，避免被 clearInterval 清掉，才可以重複利用
+        let gameTimer = 0;
+
+        let high = {
+            name: "",
+            score: 0
+        };
+
+        let highNameText = document.getElementById("highNameText");
+        let highScoreText = document.getElementById("highScoreText");
+
+        let highStorage = window.localStorage.getItem("highscore");
+        if (highStorage != null) {
+            high = JSON.parse(highStorage);
+            highNameText.innerText = high.name;
+            highScoreText.innerText = high.score;
+        }
+
+        startBtn.onclick = () => {
+            // 將開始按鈕停用
+            startBtn.setAttribute("disabled", true);
+            // 分數歸 0
+            score = 0;
+            scoreText.innerText = score;
+
+            //設定秒數
+            total = prompt("嗨，想玩幾秒?(建議10秒以上)");
+            total = parseInt(total);
+            
+            //倒數計時並確認字元是否為數字
+            if (isNaN(total)) {
+                alert("輸入的字元非數字");
+                window.location.reload();
+            } else {
+                sec.innerText = total;
+                let timer = setInterval(() => {
+                    total--;
+                    sec.innerText = total;
+                }, 1000);
+
+                gameTimer = setInterval(game, 2500);
+                game();
+                setTimeout(() => {
+                    clearInterval(gameTimer);
+                    clearInterval(timer);
+                    startBtn.removeAttribute("disabled");
+                    for (let div of divs) {
+                        div.classList.remove("out");
+                        div.classList.remove("in");
+                    }
+                    setTimeout(() => {
+                        alert(`時間到！你得到 ${score} 分。`);
+                    }, 50);
+
+                    if (score > high.score) {
+                        let playerName = prompt("恭喜你得到最高分，怎麼稱呼？");
+                        high.name = playerName;
+                        highNameText.innerText = playerName;
+                        high.score = score;
+                        highScoreText.innerText = score;
+
+                        // window.localStorage.setItem 只能存文字
+                        // JSON.stringify 可以將 JSON 陣列轉成文字
+                        window.localStorage.setItem("highscore", JSON.stringify(high));
+                    }
+                }, total * 1000);
+            }
+        }
+
+        let game = () => {
+            for (let div of divs) {
+                div.classList.remove("out");
+                div.classList.remove("in");
+            }
+
+            setTimeout(() => {
+                if (startBtn.hasAttribute("disabled")) {
+                    for (let i = 0; i < 3; i++) {
+                        let rand = Math.floor(Math.random() * 9);
+                        // 確認 divs 中有沒有重複選取 (classList 要用 contains 不能使用 include)
+                        if (divs[rand].classList.contains("out")) {
+                            i--;
+                        }
+                        divs[rand].classList.add("out");
+                    }
+                }
+            }, 10)
+        }
+
+        for (let div of divs) {
+            div.onclick = () => {
+                if (div.classList.contains("out")) {
+                    div.classList.remove("out");
+                    div.classList.add("in");
+                    score++;
+                    scoreText.innerText = score;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
