@@ -15,21 +15,21 @@
             align-items: center;
             height: 100vh;
             width: 100vw;
-            background-image: url(bg.jpg);
+            background-image: linear-gradient(360deg, rgba(255, 247, 207, 1)0%, rgba(255, 205, 191, 0.3)50%),url(bg.jpg);
             background-size: cover;
         }
 
         input {
             position: fixed;
-            top: 85%;
-            left: 75%;
+            top: 78%;
+            left: 68%;
             width: 70px;
             height: 50px;
             border-radius: 50%;
             font-weight: bold;
             font-size: 18px;
-            background-color: pink;
-            color: red;
+            background-color: rgb(71, 71, 71);
+            color: white;
             box-shadow: 0 0 3px 4px #ccc;
 
         }
@@ -105,16 +105,26 @@
 
         .score {
             position: fixed;
-            top: 60%;
-            left: 5%;
-            width: 300px;
-            height: 250px;
+            top: 55%;
+            left: 12%;
+            width: 350px;
+            height: 300px;
             font-family: '微軟正黑體', sans-serif;
             font-weight: bold;
+            background-color: rgba(221, 201, 134, 0.7);
+            text-align: center;
+            box-shadow: 0 0 10px 20px rgb(240, 227, 186) inset;
+            border-radius: 10px;
         }
 
         h3 {
             margin: 0;
+        }
+
+        .img{
+            position: fixed;
+            top:52%;
+            left:0;
         }
 
     </style>
@@ -158,15 +168,15 @@
     </table>
 
     <input type="button" value="start" id="startBtn">
-
+    
     <div class="score">
-        <h3>目前分數: <span id="scoreText">0</span></h3><br>
+        <br><h3>目前分數: <span id="scoreText">0</span></h3><br>
         <h3><span>最高分數: </span><span id="highNameText">XXX</span> 的分數是
             <span id="highScoreText">0</span></h3><br>
         <h3>註：<img src="cursor.png" style="width:30px;height:30px;">是貓草</h3>
         <h1>剩餘 <span id="sec" style="color:red">x</span> 秒</h1>
     </div>
-
+    <img src="bus.png" alt="" class="img">
     <script>
         let score = 0;
         let scoreText = document.getElementById("scoreText");
@@ -174,7 +184,6 @@
         let divs = document.getElementsByClassName("content");
 
         let sec = document.getElementById("sec");
-        // let total = 20;
 
         // 設定計時器的變數為 0 ，避免被 clearInterval 清掉，才可以重複利用
         let gameTimer = 0;
@@ -202,7 +211,7 @@
             scoreText.innerText = score;
 
             //設定秒數
-            total = prompt("嗨，想玩幾秒?(建議10秒以上)");
+            let total = prompt("嗨，想玩幾秒?(建議10秒以上)");
             total = parseInt(total);
             
             //倒數計時並確認字元是否為數字
